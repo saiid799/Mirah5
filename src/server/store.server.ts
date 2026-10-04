@@ -8,6 +8,13 @@ import { seedArticles } from './seed'
 const DIR = path.resolve(process.cwd(), 'data', 'articles')
 const fileOf = (id: string) => path.join(DIR, `${id}.json`)
 
+// على Cloudflare Workers لا يوجد نظام ملفات: نقرأ البيانات المضمّنة وقت البناء (للقراءة فقط)
+const bundled = import.meta.glob('../../data/articles/*.json', { eager: true, import: 'default' }) as Record<string, Article>
+const bundledMeta = import.meta.glob('../../data/{collections,roadmaps}.json', { eager: true, import: 'default' }) as Record<string, any>
+const metaOf = (name: string) =>
+  bundledMeta[`../../data/${name}.json`] ?? {}
+const PROD = import.meta.env.PROD
+
 let ready: Promise<void> | null = null
 
 function init() {
@@ -30,6 +37,11 @@ async function write(a: Article) {
 }
 
 export async function readAll(): Promise<Article[]> {
+  if (PROD) {
+    return Object.values(bundled)
+      .map((a) => ({ collection: '', episode: 0, ...a }) as Article)
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+  }
   await init()
   const files = (await fs.readdir(DIR)).filter((f) => f.endsWith('.json'))
   const items = await Promise.all(
@@ -48,6 +60,7 @@ export async function readAll(): Promise<Article[]> {
 }
 
 export async function saveArticle(input: ArticleInput): Promise<Article> {
+  if (PROD) throw new Error('التعديل متاح محليًا فقط')
   const all = await readAll()
   const existing = input.id ? all.find((a) => a.id === input.id) : undefined
   const now = new Date().toISOString()
@@ -88,6 +101,7 @@ export async function saveArticle(input: ArticleInput): Promise<Article> {
 }
 
 export async function removeArticle(id: string) {
+  if (PROD) throw new Error('التعديل متاح محليًا فقط')
   await init()
   if (!/^[a-z0-9]+$/.test(id)) return
   await fs.rm(fileOf(id), { force: true })
@@ -99,15 +113,19 @@ export async function buildCollections(
 ): Promise<CollectionInfo[]> {
   let meta: Record<string, { description?: string; icon?: string; totalEpisodes?: number }> = {}
   try {
-    meta = JSON.parse(
-      await fs.readFile(path.resolve(process.cwd(), 'data', 'collections.json'), 'utf8'),
-    )
+    meta = PROD
+      ? metaOf('collections')
+      : JSON.parse(
+          await fs.readFile(path.resolve(process.cwd(), 'data', 'collections.json'), 'utf8'),
+        )
   } catch {}
   let roadmaps: Record<string, { episodes?: UpcomingEpisode[] }> = {}
   try {
-    roadmaps = JSON.parse(
-      await fs.readFile(path.resolve(process.cwd(), 'data', 'roadmaps.json'), 'utf8'),
-    )
+    roadmaps = PROD
+      ? metaOf('roadmaps')
+      : JSON.parse(
+          await fs.readFile(path.resolve(process.cwd(), 'data', 'roadmaps.json'), 'utf8'),
+        )
   } catch {}
   const groups = new Map<string, Article[]>()
   for (const a of articles) {
