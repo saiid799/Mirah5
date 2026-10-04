@@ -1,0 +1,915 @@
+@import "tailwindcss";
+
+/* خطوط مخصّصة يوفّرها المالك في public/fonts — إن غاب الملف يُخفى زرّه تلقائيًا */
+@font-face { font-family: 'DecoType Naskh Swashes'; src: url('/fonts/DecoTypeNaskhSwashes.ttf') format('truetype'); font-display: swap; }
+@font-face { font-family: 'KA Hand Naskh Mob'; src: url('/fonts/KAHandNaskhMobV2.ttf') format('truetype'); font-display: swap; }
+@font-face { font-family: 'NT Panorama Naskh'; src: url('/fonts/NTPanoramaNaskhMod5.ttf') format('truetype'); font-display: swap; }
+
+/* ═════════ الثيمات التاريخية ═════════
+   andalus : ليل الأندلس — لازورد داكن وذهب قديم (الافتراضي)
+   diwan   : ليل الديوان — أسود دافئ وقرمزي ونحاس
+   noor    : نور — ثيم النهار: ورق عاجي وحبر نيلي وزمرّد */
+:root,
+:root[data-theme='andalus'] {
+  --bg: #090c15;
+  --bg2: #0e1424;
+  --surface: #141d34;
+  --ink: #f3e9d2;
+  --muted: #a6acc0;
+  --line: #2a3860;
+  --glow-2: rgba(192, 73, 47, 0.07);
+  --gold-mid: #f6e2a8;
+  --shadow: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 14px 34px -18px rgba(0, 0, 0, 0.7);
+  --accent: #d9ac4f;
+  --accent-2: #c0492f;
+  --accent-soft: rgba(217, 172, 79, 0.1);
+  --glow: rgba(217, 172, 79, 0.16);
+  --on-accent: #1a1204;
+  --font-size: 1.25rem;
+}
+:root[data-theme='diwan'] {
+  --bg: #0d0907;
+  --bg2: #150e0b;
+  --surface: #1e1411;
+  --ink: #f5e8d5;
+  --muted: #b5a396;
+  --line: #46342a;
+  --glow-2: rgba(184, 146, 61, 0.06);
+  --accent: #d9774e;
+  --accent-2: #b8923d;
+  --accent-soft: rgba(217, 119, 78, 0.1);
+  --glow: rgba(217, 119, 78, 0.16);
+  --on-accent: #1b0c05;
+}
+/* نور — ثيم النهار: ورق عاجي ناصع وحبر نيلي وزمرّد عميق (تباين النص ≥ 7:1) */
+:root[data-theme='noor'] {
+  --bg: #f6f3ec;
+  --bg2: #ede9df;
+  --surface: #ffffff;
+  --ink: #17202e;
+  --muted: #566070;
+  --line: #ddd7c8;
+  --accent: #0b6b5b;
+  --accent-2: #b3432a;
+  --accent-soft: rgba(11, 107, 91, 0.09);
+  --glow: rgba(11, 107, 91, 0.13);
+  --on-accent: #ffffff;
+  --glow-2: rgba(179, 67, 42, 0.05);
+  --gold-mid: #19a287;
+  --shadow: 0 1px 2px rgba(23, 32, 46, 0.05), 0 12px 30px -16px rgba(23, 32, 46, 0.2);
+  --star: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'%3E%3Cg fill='none' stroke='%230b6b5b' stroke-width='1'%3E%3Crect x='18' y='18' width='36' height='36'/%3E%3Crect x='18' y='18' width='36' height='36' transform='rotate(45 36 36)'/%3E%3Ccircle cx='36' cy='36' r='25'/%3E%3C/g%3E%3C/svg%3E");
+  color-scheme: light;
+}
+
+@theme {
+  --font-display: 'Aref Ruqaa', 'Amiri', serif; /* الرقعة — العناوين */
+  --font-kufi: 'Reem Kufi', sans-serif; /* الكوفي — الوسوم والتواريخ */
+  --font-amiri: 'Amiri', serif; /* النسخ الكلاسيكي */
+  --font-body: 'Noto Naskh Arabic', 'Amiri', serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  font-family: 'Noto Naskh Arabic', serif;
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(1000px 520px at 85% -8%, var(--glow), transparent 70%),
+    radial-gradient(800px 480px at 5% 12%, var(--glow-2), transparent 70%);
+  background-attachment: fixed;
+  transition: background-color 0.4s, color 0.4s;
+  -webkit-font-smoothing: antialiased;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+::selection {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 8px;
+}
+
+/* زخرفة نجمة ثمانية مبسّطة */
+:root {
+  --star: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'%3E%3Cg fill='none' stroke='%23d9ac4f' stroke-width='1'%3E%3Crect x='18' y='18' width='36' height='36'/%3E%3Crect x='18' y='18' width='36' height='36' transform='rotate(45 36 36)'/%3E%3Ccircle cx='36' cy='36' r='25'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+.container-x {
+  width: min(1120px, 100% - 2.5rem);
+  margin-inline: auto;
+}
+
+/* ═════════ عناصر عامة ═════════ */
+.gold-text {
+  background: linear-gradient(100deg, var(--accent) 10%, var(--gold-mid) 45%, var(--accent) 80%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.18rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-family: 'Reem Kufi', sans-serif;
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1.05rem;
+  border-radius: 0.6rem;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  font-family: 'Reem Kufi', sans-serif;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: transform 0.15s, border-color 0.2s, background 0.2s, box-shadow 0.2s;
+}
+.btn:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 70%, #fff));
+  border-color: transparent;
+  color: var(--on-accent);
+  font-weight: 700;
+  box-shadow: 0 6px 22px -8px var(--accent);
+}
+.btn-danger:hover {
+  border-color: var(--accent-2);
+  color: var(--accent-2);
+}
+
+.field {
+  width: 100%;
+  padding: 0.65rem 0.9rem;
+  border-radius: 0.7rem;
+  border: 1px solid var(--line);
+  background: var(--bg2);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.95rem;
+}
+.field:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.orn {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: var(--accent);
+  justify-content: center;
+}
+.orn::before,
+.orn::after {
+  content: '';
+  height: 1px;
+  flex: 1;
+  max-width: 140px;
+  background: linear-gradient(to left, var(--accent), transparent);
+}
+.orn::after {
+  transform: scaleX(-1);
+}
+
+/* ═════════ البطاقات ═════════ */
+@layer components {
+  .card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: 1rem;
+    border: 1px solid var(--line);
+    background: linear-gradient(160deg, var(--surface), var(--bg2));
+    transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+  }
+}
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border: 1px solid color-mix(in srgb, var(--accent) 0%, transparent);
+  border-radius: 0.7rem;
+  pointer-events: none;
+  transition: border-color 0.3s;
+  z-index: 2;
+}
+a.card:hover {
+  transform: translateY(-5px);
+  border-color: var(--accent);
+  box-shadow: 0 24px 50px -24px var(--glow), 0 0 0 1px var(--glow);
+}
+a.card:hover::before {
+  border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+}
+.card h3,
+.card h2 {
+  font-family: 'Amiri', serif;
+}
+.card h2 {
+  font-family: 'Aref Ruqaa', serif;
+}
+
+.cover {
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+}
+.cover::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--star);
+  background-size: 72px;
+  opacity: 0.16;
+  mix-blend-mode: overlay;
+}
+.cover::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(5, 8, 16, 0.75), transparent 60%);
+}
+.cover-art::before {
+  display: none;
+}
+.cover-art::after {
+  background: linear-gradient(to top, rgba(5, 8, 16, 0.55), transparent 45%);
+}
+.cover-period {
+  position: absolute;
+  z-index: 1;
+  inset-inline-start: 1.1rem;
+  bottom: 0.7rem;
+  font-family: 'Reem Kufi', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: #f6e2a8;
+  letter-spacing: 0.04em;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.6);
+}
+
+/* ═════════ الهيرو ═════════ */
+.hero {
+  position: relative;
+  isolation: isolate;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: -2rem 0 0;
+  z-index: -1;
+  background-image: var(--star);
+  background-size: 96px;
+  opacity: 0.07;
+  -webkit-mask-image: radial-gradient(ellipse 55% 70% at 50% 40%, #000, transparent 75%);
+  mask-image: radial-gradient(ellipse 55% 70% at 50% 40%, #000, transparent 75%);
+}
+
+/* ═════════ القراءة ═════════ */
+.reader {
+  font-family: var(--reader-font, 'Amiri'), serif;
+  font-size: var(--font-size);
+  line-height: 2.15;
+  color: color-mix(in srgb, var(--ink) 92%, transparent);
+}
+.reader {
+  max-width: 40rem;
+  margin-inline: auto;
+}
+.reader p {
+  text-wrap: pretty;
+  hyphens: none;
+}
+.reader .lead p {
+  font-size: 1.1em;
+  line-height: 2.05;
+  color: var(--ink);
+}
+.reader h2 {
+  scroll-margin-top: 5.5rem;
+}
+.reader ol {
+  list-style: none;
+  counter-reset: n;
+  margin: 0 0 1.6em;
+  padding: 0;
+}
+.reader ol li {
+  counter-increment: n;
+  position: relative;
+  padding: 0.55em 3em 0.55em 0;
+  margin-bottom: 0.4em;
+  border-bottom: 1px dashed var(--line);
+}
+.reader ol li::marker {
+  content: '';
+}
+.reader ol li::before {
+  content: counter(n);
+  position: absolute;
+  inset-inline-start: 0;
+  top: 0.5em;
+  width: 2em;
+  height: 2em;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  color: var(--accent);
+  font-family: 'Reem Kufi', sans-serif;
+  font-size: 0.8em;
+}
+.reader ol li {
+  padding-inline-start: 3em;
+  padding-inline-end: 0;
+}
+.fact {
+  position: relative;
+  margin: 1.8em 0;
+  padding: 1.1em 1.3em 0.4em;
+  border-radius: 1rem;
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  background: linear-gradient(135deg, var(--accent-soft), transparent 75%);
+}
+.fact-label {
+  display: inline-block;
+  margin-bottom: 0.4em;
+  padding: 0.05em 0.8em;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-family: 'Reem Kufi', sans-serif;
+  font-size: 0.7em;
+  font-weight: 600;
+}
+.fact p {
+  margin: 0 0 0.9em;
+  font-size: 0.96em;
+  line-height: 1.95;
+}
+.toc {
+  margin: 2rem auto 0;
+  max-width: 40rem;
+  padding: 1.1rem 1.4rem;
+  border-radius: 1rem;
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+.toc-title {
+  font-family: 'Reem Kufi', sans-serif;
+  color: var(--accent);
+  font-size: 0.9rem;
+}
+.toc ol {
+  list-style: none;
+  margin: 0.6rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.15rem;
+}
+.toc a {
+  display: flex;
+  gap: 0.7rem;
+  align-items: baseline;
+  padding: 0.3rem 0;
+  font-family: 'Amiri', serif;
+  font-size: 1.05rem;
+  color: var(--muted);
+  transition: color 0.15s;
+}
+.toc a:hover {
+  color: var(--ink);
+}
+.toc a b {
+  font-family: 'Reem Kufi', sans-serif;
+  font-weight: 500;
+  color: var(--accent);
+  min-width: 1.4em;
+}
+.reader p {
+  margin: 0 0 1.45em;
+}
+.reader h2 {
+  font-family: 'Aref Ruqaa', serif;
+  font-size: 1.75em;
+  margin: 2em 0 0.6em;
+  line-height: 1.5;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  gap: 0.7em;
+}
+.reader h2::before {
+  content: '◆';
+  font-size: 0.45em;
+  color: var(--accent-2);
+}
+.reader h2::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to left, var(--line), transparent);
+}
+.reader h3 {
+  font-family: 'Reem Kufi', sans-serif;
+  font-size: 1.15em;
+  margin: 1.6em 0 0.4em;
+  color: var(--accent);
+}
+.reader figure {
+  margin: 2em 0;
+}
+.reader figure img {
+  display: block;
+  width: 100%;
+  max-height: 460px;
+  object-fit: cover;
+  border-radius: 0.9rem;
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+.reader figcaption {
+  margin-top: 0.6em;
+  font-family: 'Noto Naskh Arabic', serif;
+  font-size: 0.78em;
+  line-height: 1.8;
+  color: var(--muted);
+  text-align: center;
+}
+.reader figcaption small {
+  display: block;
+  font-family: 'Reem Kufi', sans-serif;
+  font-size: 0.8em;
+  opacity: 0.75;
+}
+.reader figcaption a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.reader blockquote {
+  position: relative;
+  margin: 2.2em 0;
+  padding: 1.2em 2.2em 1.2em 1.6em;
+  background: linear-gradient(120deg, var(--accent-soft), transparent);
+  border-inline-start: 3px solid var(--accent);
+  border-radius: 0.3rem 1rem 1rem 0.3rem;
+  font-family: 'Aref Ruqaa', serif;
+  font-size: 1.2em;
+  line-height: 2;
+}
+.reader blockquote::before {
+  content: '❞';
+  position: absolute;
+  inset-inline-end: 0.5em;
+  top: -0.1em;
+  font-size: 3em;
+  line-height: 1;
+  color: var(--accent);
+  opacity: 0.35;
+}
+.reader ul {
+  margin: 0 0 1.45em;
+  padding-inline-start: 1.3em;
+}
+.reader li {
+  margin-bottom: 0.35em;
+}
+.reader li::marker {
+  color: var(--accent);
+  content: '◆  ';
+  font-size: 0.7em;
+}
+.reader strong {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.progress {
+  position: fixed;
+  inset-block-start: 0;
+  inset-inline: 0;
+  height: 3px;
+  z-index: 60;
+}
+.progress > i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(to left, var(--accent), var(--accent-2));
+  box-shadow: 0 0 12px var(--accent);
+  transform-origin: right;
+}
+
+.swatch {
+  width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 50%;
+  border: 2px solid var(--line);
+  cursor: pointer;
+  transition: transform 0.15s, border-color 0.15s;
+}
+.swatch:hover {
+  transform: scale(1.15);
+}
+.swatch[aria-pressed='true'] {
+  border-color: var(--ink);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.rise {
+  animation: rise 0.7s both;
+}
+
+/* ═════════ فلتر ألوان صور الأغلفة ═════════
+   فلتر موحَّد وخفيف لكل الأغلفة: تقليل بسيط للتشبّع ثم لمسة لونية واحدة من الثيم
+   (--accent إلى --accent-2) بوضع color، فتبدو كل الصور من عائلة لونية واحدة
+   وتحتفظ بألوانها الطبيعية. يتبدّل تلقائيًا مع الثيم. للأغلفة فقط (لا صور المتن). */
+.cover-photo {
+  background-color: var(--bg2);
+  isolation: isolate;
+}
+.cover-photo::before {
+  display: none;
+}
+.cover-img {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: saturate(0.7) contrast(1.05);
+}
+.cover-photo::after {
+  z-index: 2;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  mix-blend-mode: color;
+  opacity: 0.3;
+}
+.cover-shade {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: linear-gradient(to top, rgba(5, 8, 16, 0.72), transparent 55%);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+.cover-photo .cover-period {
+  z-index: 4;
+}
+
+/* ═════════ التجاوب مع كل الشاشات ═════════ */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+body {
+  overflow-x: clip; /* شبكة أمان: لا تمرير أفقي أبدًا */
+  -webkit-tap-highlight-color: transparent;
+}
+img,
+svg,
+video {
+  max-width: 100%;
+}
+.card,
+.card > * {
+  min-width: 0;
+}
+.card h2,
+.card h3,
+.reader p,
+.reader li {
+  overflow-wrap: anywhere;
+}
+
+/* هوامش آمنة (الحافة المقوّسة/النتوء) وعرض أوسع للشاشات الكبيرة */
+.container-x {
+  width: min(1120px, 100% - 2rem);
+  padding-inline: env(safe-area-inset-right) env(safe-area-inset-left);
+}
+@media (min-width: 640px) {
+  .container-x {
+    width: min(1120px, 100% - 3rem);
+  }
+}
+@media (min-width: 1536px) {
+  .container-x {
+    width: min(1240px, 100% - 6rem);
+  }
+}
+
+/* صف أزرار قابل للتمرير الأفقي (الفلاتر) بدل التفاف يأكل الشاشة */
+.scroll-row {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  margin-inline: -1rem;
+  padding: 0.25rem 1rem 0.6rem;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.scroll-row::-webkit-scrollbar {
+  display: none;
+}
+.scroll-row > * {
+  scroll-snap-align: center;
+}
+@media (min-width: 640px) {
+  .scroll-row {
+    flex-wrap: wrap;
+    justify-content: center;
+    overflow: visible;
+    margin-inline: 0;
+    padding: 0;
+  }
+}
+
+/* شريط التنقل السفلي للهواتف */
+.bottom-nav {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 55;
+  display: flex;
+  justify-content: space-around;
+  padding: 0.35rem 0.5rem calc(0.35rem + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--line);
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+.bottom-nav-item {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.4rem 0.25rem;
+  min-height: 3rem;
+  border-radius: 0.8rem;
+  color: var(--muted);
+  font-family: 'Reem Kufi', sans-serif;
+  font-size: 0.72rem;
+  transition: color 0.2s, background 0.2s;
+}
+.bottom-nav-item[data-active='true'] {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+/* أهداف لمس مريحة (٤٤px) */
+@media (pointer: coarse) {
+  .btn {
+    min-height: 2.75rem;
+  }
+  .swatch {
+    position: relative;
+    width: 1.35rem;
+    height: 1.35rem;
+  }
+  .swatch::after {
+    content: '';
+    position: absolute;
+    inset: -0.55rem;
+  }
+  .toc a {
+    padding: 0.55rem 0;
+  }
+}
+
+/* لا حركات «hover» على اللمس (تعلق بعد النقر) */
+@media (hover: none) {
+  a.card:hover {
+    transform: none;
+    box-shadow: none;
+    border-color: var(--line);
+  }
+  .btn:hover {
+    transform: none;
+  }
+  a.card:active {
+    transform: scale(0.985);
+  }
+}
+
+/* الهواتف */
+@media (max-width: 639px) {
+  :root {
+    --font-size: 1.15rem;
+  }
+  body {
+    background-attachment: scroll; /* fixed يتقطع في iOS */
+  }
+  .reader {
+    line-height: 2.05;
+  }
+  .reader h2 {
+    font-size: 1.45em;
+    margin-top: 1.6em;
+    gap: 0.5em;
+  }
+  .reader blockquote {
+    margin: 1.6em 0;
+    padding: 1em 1.2em 1em 1em;
+    font-size: 1.08em;
+  }
+  .reader figure {
+    margin: 1.5em -0.25rem;
+  }
+  .reader figure img {
+    max-height: 300px;
+    border-radius: 0.7rem;
+  }
+  .reader ol li {
+    padding-inline-start: 2.6em;
+  }
+  .fact {
+    padding: 0.9em 1em 0.3em;
+    margin: 1.4em 0;
+  }
+  .toc {
+    padding: 0.9rem 1rem;
+  }
+  .cover-period {
+    font-size: 1.15rem;
+    inset-inline-start: 0.8rem;
+    bottom: 0.5rem;
+  }
+  .card::before {
+    inset: 4px;
+  }
+}
+
+/* الشاشات الصغيرة جدًا */
+@media (max-width: 360px) {
+  .btn {
+    padding-inline: 0.8rem;
+  }
+  .bottom-nav-item span {
+    font-size: 0.68rem;
+  }
+}
+
+/* الوضع الأفقي القصير في الهاتف: شريط سفلي أنحف */
+@media (max-height: 480px) and (orientation: landscape) {
+  .bottom-nav-item {
+    flex-direction: row;
+    justify-content: center;
+    min-height: 2.4rem;
+  }
+}
+
+/* من يفضّل تقليل الحركة */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.toc > summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.toc > summary::-webkit-details-marker {
+  display: none;
+}
+.toc > summary::after {
+  content: '▾';
+  transition: transform 0.2s;
+}
+.toc[open] > summary::after {
+  transform: rotate(180deg);
+}
+
+/* روابط الهيدر تظهر على الشاشات المتوسطة فأكبر فقط (يحلّ محلها الشريط السفلي) */
+.nav-desktop {
+  display: none;
+}
+@media (min-width: 768px) {
+  .nav-desktop {
+    display: inline-flex;
+  }
+}
+
+/* الشريط السفلي للهواتف فقط (< 768px) */
+@media (min-width: 768px) {
+  .bottom-nav {
+    display: none;
+  }
+}
+
+/* ═════════ الشعار ═════════ */
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+.logo-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.28rem;
+}
+.logo-tag {
+  font-family: 'Reem Kufi', sans-serif;
+  font-size: 0.62rem;
+  letter-spacing: 0.22em;
+  color: var(--muted);
+  padding-inline-start: 0.1rem;
+}
+@media (max-width: 359px) {
+  .logo-tag {
+    display: none;
+  }
+}
+
+/* ═════════ لمسات الثيمات (عمق البطاقات + ثيم «نور» النهاري) ═════════ */
+.card {
+  box-shadow: var(--shadow);
+}
+:root[data-theme='noor'] .card {
+  background: var(--surface);
+}
+:root[data-theme='noor'] a.card:hover {
+  box-shadow: 0 22px 44px -22px rgba(11, 107, 91, 0.38), 0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+:root[data-theme='noor'] .btn {
+  background: var(--surface);
+  box-shadow: 0 1px 2px rgba(23, 32, 46, 0.06);
+}
+:root[data-theme='noor'] .btn-primary {
+  background: linear-gradient(135deg, #0b6b5b, #0d7a67);
+  box-shadow: 0 8px 20px -10px rgba(11, 107, 91, 0.7);
+}
+:root[data-theme='noor'] .chip {
+  background: var(--accent-soft);
+  border-color: color-mix(in srgb, var(--accent) 28%, transparent);
+}
+:root[data-theme='noor'] .reader {
+  color: var(--ink);
+}
+:root[data-theme='noor'] .reader .lead p {
+  color: var(--ink);
+}
+:root[data-theme='noor'] .reader strong {
+  color: #0a4f43;
+}
+:root[data-theme='noor'] .toc,
+:root[data-theme='noor'] .fact {
+  box-shadow: var(--shadow);
+}
+:root[data-theme='noor'] .field {
+  background: var(--surface);
+}
+:root[data-theme='noor'] header.sticky {
+  box-shadow: 0 1px 0 var(--line), 0 8px 24px -18px rgba(23, 32, 46, 0.25);
+}
