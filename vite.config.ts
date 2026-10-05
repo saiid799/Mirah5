@@ -7,9 +7,10 @@ import viteReact from '@vitejs/plugin-react'
 import { cloudflare } from '@cloudflare/vite-plugin'
 import tailwindcss from '@tailwindcss/vite'
 
-const config = defineConfig({
+// Cloudflare Workers لا يوفّر نظام ملفات، لذا نفعّل الإضافة عند البناء فقط ونشغّل التطوير على Node
+const config = defineConfig(({ command }) => ({
   resolve: { tsconfigPaths: true },
-  plugins: [cloudflare({ viteEnvironment: { name: 'ssr' } }), devtools(), tailwindcss(), tanstackStart(), viteReact()],
-})
+  plugins: [...(command === 'build' ? [cloudflare({ viteEnvironment: { name: 'ssr' } })] : []), devtools(), tailwindcss(), tanstackStart(), viteReact()],
+}))
 
 export default config
